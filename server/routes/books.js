@@ -2,6 +2,7 @@
 let express = require('express');
 let router = express.Router();
 let mongoose = require('mongoose');
+const books= require('../models/books');
 
 // define the book model
 let book = require('../models/books');
@@ -59,26 +60,59 @@ router.post('/add', (req, res, next) => {
 // GET the Book Details page in order to edit an existing Book
 router.get('/:id', (req, res, next) => {
 
-    /*****************
-     * ADD CODE HERE *
-     *****************/
+   let id = req.params.id;
+   books.findById(id,(err,book) => {
+     if(err){
+       console.log(err);
+       res.end(err);
+     }
+     else{
+       res.render('books/details',{
+         title:"Edit a book",
+         books:book
+       });
+     }
+   });
+    
 });
 
 // POST - process the information passed from the details form and update the document
 router.post('/:id', (req, res, next) => {
 
-    /*****************
-     * ADD CODE HERE *
-     *****************/
+  let id = req.params.id;
+  let editedBook = books({
+    "_id":id,
+    'Title':req.body.title,
+    'Description':"",
+    'Price':req.body.price,
+    'Author':req.body.author,
+    'Genre':req.body.genre
+  });
+  books.update({_id:id},editedBook,(err)=>{
+    if(err){
+      console.log(err);
+      res.end(err);
+    }
+    else{
+      res.redirect('/books');
+    }
+  });
 
 });
 
 // GET - process the delete by user id
 router.get('/delete/:id', (req, res, next) => {
 
-    /*****************
-     * ADD CODE HERE *
-     *****************/
+  let id = req.params.id;
+  books.remove({_id:id},(err)=>{
+    if(err){
+      console.log(err);
+      res.end(err);
+    }
+    else{
+      res.redirect('/books');
+    }
+  });
 });
 
 
